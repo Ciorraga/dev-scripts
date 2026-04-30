@@ -2,11 +2,11 @@
 
 Personal collection of scripts to automate common development tasks.
 
-This repository contains small scripts and utilities that I use to simplify repetitive development workflows, repository maintenance, local environment tasks, and small CLI utilities.
+This repository contains small scripts and utilities that simplify repetitive development workflows, repository maintenance, local environment tasks, and small CLI operations.
 
 ## Scripts
 
-### Shell scripts
+### Shell
 
 | Script | Description |
 |---|---|
@@ -15,13 +15,14 @@ This repository contains small scripts and utilities that I use to simplify repe
 
 See [`shell/README.md`](shell/README.md) for usage details.
 
-### Python scripts
+### Python
 
 | Script | Description |
 |---|---|
-| [`uuid7gen.py`](python/uuid7gen.py) | Generates UUIDv7 identifiers from the command line. |
+| [`uuid7gen`](python/uuid7gen/) | Generates UUIDv7 identifiers from the command line. |
+| [`uuid7_sql_replacer`](python/uuid7_sql_replacer/) | Replaces UUID values in simple SQL `INSERT` and `UPDATE` statements with UUIDv7 identifiers. |
 
-See [`python/README.md`](python/README.md) for usage details.
+See [`python/README.md`](python/README.md) for the Python scripts index.
 
 ## Requirements
 
@@ -34,7 +35,7 @@ Common tools used by these scripts include:
 - Maven
 - Python 3
 
-Check each script section for specific requirements and usage examples.
+Check each script README for specific requirements and usage instructions.
 
 ## Disclaimer
 
