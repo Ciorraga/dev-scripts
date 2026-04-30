@@ -9,12 +9,37 @@ This repository contains small scripts and utilities that I use to simplify repe
 | Script | Description |
 |---|---|
 | `update-repos.sh` | Updates the given branch across all Git repositories inside the current directory. |
+| `build-maven-projects.sh` | Runs Maven goals across all Maven projects inside the current directory. |
+
+## Requirements
+
+Most scripts are written in Bash and are intended to run on Unix-like systems such as Linux or macOS.
+
+Depending on the script, you may need some tools installed locally:
+
+- Git
+- Maven
+
+Some scripts may use project-specific wrappers, such as Maven Wrapper, when available.
 
 ## Usage
 
-Each script includes its own usage instructions. In general, scripts can be executed directly from the terminal.
+### `update-repos.sh`
 
-Example:
+Updates a target branch across all Git repositories inside the current directory.
+
+The branch is mandatory and must be provided using `-b`.
 
 ```bash
-./update-repos.sh -b develop
+./update-repos.sh -b <branch>
+```
+
+### `build-maven-projects.sh`
+
+Runs Maven goals across all Maven projects inside the current directory.
+
+#### Usage
+
+```bash
+./build-maven-projects.sh [options]
+```
