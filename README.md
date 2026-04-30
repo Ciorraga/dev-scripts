@@ -21,6 +21,7 @@ See [`shell/README.md`](shell/README.md) for usage details.
 |---|---|
 | [`uuid7gen`](python/uuid7gen/) | Generates UUIDv7 identifiers from the command line. |
 | [`uuid7_sql_replacer`](python/uuid7_sql_replacer/) | Replaces UUID values in simple SQL `INSERT` and `UPDATE` statements with UUIDv7 identifiers. |
+| [`update_sql_field_from_csv`](python/update_sql_field_from_csv/) | Updates a SQL field using values from a CSV file. |
 
 See [`python/README.md`](python/README.md) for the Python scripts index.
 
