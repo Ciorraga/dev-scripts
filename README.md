@@ -13,6 +13,7 @@ This repository contains small scripts and utilities that simplify repetitive de
 | [`update-repos`](shell/update-repos/) | Updates the given branch across all Git repositories inside the current directory. |
 | [`build-maven-projects`](shell/build-maven-projects/) | Runs Maven goals across all Maven projects inside the current directory. |
 | [`branch-cleaner`](shell/branch-cleaner/) | Detects and optionally deletes local Git branches that are merged or have a gone remote tracking branch. |
+| [`repo-status-all`](shell/repo-status-all/) | Shows branch, local changes, upstream, and sync status for all Git repositories inside the current directory. |
 
 See [`shell/README.md`](shell/README.md) for the Shell scripts index.
 

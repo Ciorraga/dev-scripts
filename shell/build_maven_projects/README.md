@@ -1,6 +1,8 @@
 # Build Maven Projects
 
-Shell script to run Maven goals across all Maven projects inside the current directory.
+Shell script to run Maven goals across all Maven projects inside a target directory.
+
+By default, it checks Maven projects inside the current directory. You can provide a specific path using `-p` or `--path`.
 
 By default, it runs:
 
@@ -16,7 +18,9 @@ If a project contains Maven Wrapper, the script uses it automatically:
 
 ## Features
 
-- Processes all Maven projects inside the current directory.
+- Processes all Maven projects inside a target directory.
+- Uses the current directory by default.
+- Allows selecting a specific path with `-p` or `--path`.
 - Detects Maven projects by checking for `pom.xml`.
 - Uses Maven Wrapper when available.
 - Falls back to local `mvn` when Maven Wrapper is not available.
@@ -41,10 +45,16 @@ Maven is not required globally if each project contains Maven Wrapper.
 
 ## Examples
 
-### Run the default Maven build
+### Run the default Maven build in the current directory
 
 ```bash
 ./build-maven-projects.sh
+```
+
+### Run the default Maven build in a specific path
+
+```bash
+./build-maven-projects.sh -p ~/workspace/services
 ```
 
 ### Run custom Maven goals
@@ -53,10 +63,22 @@ Maven is not required globally if each project contains Maven Wrapper.
 ./build-maven-projects.sh -g "clean package"
 ```
 
+### Run custom Maven goals in a specific path
+
+```bash
+./build-maven-projects.sh -p ~/workspace/services -g "clean package"
+```
+
 ### Skip tests
 
 ```bash
 ./build-maven-projects.sh --skip-tests
+```
+
+### Skip tests in a specific path
+
+```bash
+./build-maven-projects.sh -p ~/workspace/services --skip-tests
 ```
 
 ### Run in offline mode
@@ -68,7 +90,7 @@ Maven is not required globally if each project contains Maven Wrapper.
 ### Combine options
 
 ```bash
-./build-maven-projects.sh -g "clean verify" --skip-tests
+./build-maven-projects.sh -p ~/workspace/services -g "clean verify" --skip-tests
 ```
 
 ### Show help
@@ -81,6 +103,7 @@ Maven is not required globally if each project contains Maven Wrapper.
 
 | Option | Description |
 |---|---|
+| `-p`, `--path <path>` | Path containing Maven projects. Default: current directory. |
 | `-g <goals>` | Maven goals to run. Default: `"clean install"`. |
 | `--skip-tests` | Skip test execution using `-DskipTests`. |
 | `--offline` | Run Maven in offline mode using `-o`. |
@@ -88,7 +111,9 @@ Maven is not required globally if each project contains Maven Wrapper.
 
 ## Notes
 
-- The script must be executed from a directory containing Maven projects as direct child folders.
+- By default, the script checks Maven projects inside the current directory.
+- Use `-p` or `--path` to run it against a specific directory containing Maven projects.
+- The selected path must contain Maven projects as direct child folders.
 - Directories without a `pom.xml` are skipped.
 - If one project fails, the script continues with the remaining projects.
 - If at least one build fails, the script exits with status code `1`.

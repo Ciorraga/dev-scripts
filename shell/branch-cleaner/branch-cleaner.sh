@@ -9,6 +9,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+TARGET_PATH="."
 BASE_BRANCH=""
 DELETE=false
 FORCE=false
@@ -25,6 +26,7 @@ Usage:
   $(basename "$0") [options]
 
 Options:
+  -p, --path <path>       Path to the Git repository. Default: current directory.
   -b, --base <branch>     Base branch used to detect merged branches.
                           Default: current branch.
   --delete                Delete detected branches.
@@ -39,11 +41,12 @@ Options:
 
 Examples:
   $(basename "$0")
-  $(basename "$0") -b develop
-  $(basename "$0") --gone-only
-  $(basename "$0") --merged-only -b main
-  $(basename "$0") --delete -b develop
-  $(basename "$0") --delete --force --gone-only
+  $(basename "$0") -p ~/workspace/service-users
+  $(basename "$0") -p ~/workspace/service-users -b develop
+  $(basename "$0") -p ~/workspace/service-users --gone-only
+  $(basename "$0") -p ~/workspace/service-users --merged-only -b main
+  $(basename "$0") -p ~/workspace/service-users --delete -b develop
+  $(basename "$0") -p ~/workspace/service-users --delete --force --gone-only
 EOF
 }
 
@@ -74,8 +77,74 @@ log_error() {
     color "$RED" "$1"
 }
 
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -p|--path)
+                if [[ -z "${2:-}" ]]; then
+                    log_error "Error: Option $1 requires a path."
+                    echo
+                    print_usage
+                    exit 1
+                fi
+                TARGET_PATH="$2"
+                shift 2
+                ;;
+            -b|--base)
+                if [[ -z "${2:-}" ]]; then
+                    log_error "Error: Option $1 requires a branch name."
+                    echo
+                    print_usage
+                    exit 1
+                fi
+                BASE_BRANCH="$2"
+                shift 2
+                ;;
+            --delete)
+                DELETE=true
+                shift
+                ;;
+            --force)
+                FORCE=true
+                shift
+                ;;
+            --yes)
+                YES=true
+                shift
+                ;;
+            --gone-only)
+                MODE="gone"
+                shift
+                ;;
+            --merged-only)
+                MODE="merged"
+                shift
+                ;;
+            --no-fetch)
+                FETCH=false
+                shift
+                ;;
+            --no-color)
+                NO_COLOR=true
+                shift
+                ;;
+            -h|--help)
+                print_usage
+                exit 0
+                ;;
+            *)
+                log_error "Error: Unknown option '$1'."
+                echo
+                print_usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
 is_git_repo() {
-    git rev-parse --is-inside-work-tree >/dev/null 2>&1
+    local path="$1"
+    git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1
 }
 
 current_branch() {
@@ -144,61 +213,6 @@ add_candidate() {
     CANDIDATE_REASONS+=("$reason")
 }
 
-parse_args() {
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -b|--base)
-                if [[ -z "${2:-}" ]]; then
-                    log_error "Error: Option $1 requires a branch name."
-                    echo
-                    print_usage
-                    exit 1
-                fi
-                BASE_BRANCH="$2"
-                shift 2
-                ;;
-            --delete)
-                DELETE=true
-                shift
-                ;;
-            --force)
-                FORCE=true
-                shift
-                ;;
-            --yes)
-                YES=true
-                shift
-                ;;
-            --gone-only)
-                MODE="gone"
-                shift
-                ;;
-            --merged-only)
-                MODE="merged"
-                shift
-                ;;
-            --no-fetch)
-                FETCH=false
-                shift
-                ;;
-            --no-color)
-                NO_COLOR=true
-                shift
-                ;;
-            -h|--help)
-                print_usage
-                exit 0
-                ;;
-            *)
-                log_error "Error: Unknown option '$1'."
-                echo
-                print_usage
-                exit 1
-                ;;
-        esac
-    done
-}
-
 confirm_delete() {
     if [[ "$YES" == true ]]; then
         return 0
@@ -254,10 +268,19 @@ delete_candidates() {
 main() {
     parse_args "$@"
 
-    if ! is_git_repo; then
-        log_error "Error: This directory is not inside a Git repository."
+    if [[ ! -d "$TARGET_PATH" ]]; then
+        log_error "Error: Path '$TARGET_PATH' does not exist or is not a directory."
         exit 1
     fi
+
+    TARGET_PATH="$(cd "$TARGET_PATH" && pwd)"
+
+    if ! is_git_repo "$TARGET_PATH"; then
+        log_error "Error: Path '$TARGET_PATH' is not inside a Git repository."
+        exit 1
+    fi
+
+    cd "$TARGET_PATH" || exit 1
 
     local current
     current=$(current_branch)
@@ -277,6 +300,7 @@ main() {
     fi
 
     log_warn "Starting branch cleanup analysis..."
+    log_info "Target repository: $TARGET_PATH"
     log_info "Current branch: $current"
     log_info "Base branch: $BASE_BRANCH"
 
@@ -329,7 +353,12 @@ main() {
     for i in "${!CANDIDATE_BRANCHES[@]}"; do
         branch="${CANDIDATE_BRANCHES[$i]}"
         reason="${CANDIDATE_REASONS[$i]}"
-        echo -e "  ${RED}${branch}${NC} - ${reason}"
+
+        if [[ "$NO_COLOR" == true ]]; then
+            echo "  ${branch} - ${reason}"
+        else
+            echo -e "  ${RED}${branch}${NC} - ${reason}"
+        fi
     done
 
     echo

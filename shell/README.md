@@ -11,6 +11,7 @@ Each script has its own folder and README.
 | [`update-repos`](update-repos/) | Updates the given branch across all Git repositories inside the current directory. |
 | [`build-maven-projects`](build-maven-projects/) | Runs Maven goals across all Maven projects inside the current directory. |
 | [`branch-cleaner`](branch-cleaner/) | Detects and optionally deletes local Git branches that are merged or have a gone remote tracking branch. |
+| [`repo-status-all`](repo-status-all/) | Shows branch, local changes, upstream, and sync status for all Git repositories inside the current directory. |
 
 ## Requirements
 

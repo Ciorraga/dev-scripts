@@ -13,22 +13,28 @@ declare -a FAILED_REPOS
 declare -a SKIPPED_REPOS
 
 TARGET_BRANCH=""
+TARGET_PATH="."
 
 print_usage() {
-    echo "Usage: $(basename "$0") -b <branch>"
+    echo "Usage: $(basename "$0") -b <branch> [options]"
     echo
     echo "Options:"
-    echo "  -b <branch>   Branch to update"
+    echo "  -b <branch>   Branch to update. Required."
+    echo "  -p <path>     Path containing Git repositories. Default: current directory."
     echo "  -h            Show this help message"
     echo
-    echo "Example:"
+    echo "Examples:"
     echo "  $(basename "$0") -b develop"
+    echo "  $(basename "$0") -b develop -p ~/workspace/services"
 }
 
-while getopts ":b:h" opt; do
+while getopts ":b:p:h" opt; do
     case "$opt" in
         b)
             TARGET_BRANCH="$OPTARG"
+            ;;
+        p)
+            TARGET_PATH="$OPTARG"
             ;;
         h)
             print_usage
@@ -56,11 +62,21 @@ if [[ -z "$TARGET_BRANCH" ]]; then
     exit 1
 fi
 
+if [[ ! -d "$TARGET_PATH" ]]; then
+    echo -e "${RED}Error: Path '$TARGET_PATH' does not exist or is not a directory.${NC}"
+    exit 1
+fi
+
+TARGET_PATH="$(cd "$TARGET_PATH" && pwd)"
+
 echo -e "${YELLOW}Starting repositories update...${NC}"
 echo -e "${BLUE}Target branch: ${TARGET_BRANCH}${NC}"
+echo -e "${BLUE}Target path: ${TARGET_PATH}${NC}"
 echo
 
-for dir in */; do
+for dir in "$TARGET_PATH"/*/; do
+    [[ -d "$dir" ]] || continue
+
     repo_name=$(basename "$dir")
 
     if [[ ! -d "$dir/.git" ]]; then
